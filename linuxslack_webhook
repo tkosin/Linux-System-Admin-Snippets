@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Author: Yod (theerayooth.k@facgure.com)
+# This script is to monitor and capture the data from login user who switch from another user
+# and response to Slack channel
+
+SLACK_CHANNEL_WEBHOOK=https://hooks.slack.com/services/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ysp
+SLACK_CHANNEL_NAME="#fg-erp"
+HOSTNAME=`hostname`
+CWD=`pwd`
+LOGIN_DATETIME=$(date +%Y-%m-%d" "%H:%M:%S)
+
+# Create Slack's payload
+slack_post() {
+        cat <<EOF
+payload={
+        "channel": "$SLACK_CHANNEL_NAME",
+        "username": "System Watchdog",
+        "text": "Hey guys! Someone logged in to [$HOSTNAME] and try to do something at [$CWD] :scream:",
+        "attachments": [
+                {
+                        "author_name": "By Facgure Developer",
+                        "title": "Login capture",
+                        "text": "Active login at $LOGIN_DATETIME"
+                }
+        ]
+}
+EOF
+}
+
+# Notify to Slack
+curl -X POST --data-urlencode "$(slack_post)" $SLACK_CHANNEL_WEBHOOK >> /dev/null 2>> /dev/null
